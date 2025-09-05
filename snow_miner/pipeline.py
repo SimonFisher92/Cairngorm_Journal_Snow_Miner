@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple, Optional
 from .scraper import get_pdf_links, download_pdfs
 from .pdf_text import extract_text_pages
 #from .entities import iter_sentences, find_entities_in_sentence, nearest_date
-from .sentiment import snow_sentiment_score
 from .gpt_analyse import analyze_with_gpt
 from .config import YEAR_REGEX
 
