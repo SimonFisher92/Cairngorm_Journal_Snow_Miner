@@ -110,15 +110,17 @@ EXTRACTION_PROMPT = """You extract snow-related information like a cryoscientist
 You are very good at it and you are aptly praised for your ability to stick to the prompt and not hallucinate
 
 From the CHUNK given to you, find compact snippets (≤5 sentences) that mention snow or ice including surface/avalanche conditions, 
-cornices, frozen lochs etc- anything to do with the cryosphere.
+cornices, frozen lochs etc- anything to do with the cryosphere. I want you to double check though- it must actually relate to snow
+in some way and not just describe a mountain feature without mentioning snow or ice. It MUST mention snow or icw or do not include it!
 For each, output a JSON object with:
 - "text": the exact snippet (copy verbatim from CHUNK; do NOT paraphrase- be a good scientist)
 - "entity": key snow term (e.g., snow, powder, deep, windslab, cornice, avalanche, thaw, melted, none, patchy, slushy)- 
 you can use more than one if you want to, such as "deep, frozen" etc
 - "location": mountain/area name if present (Gaelic ok), else null- be careful here as there will likely be more than 
 one location, just try your best
-- "score": it is up to you to decide the "sentiment" of the text. If the snow description is clearly  very positive like
- "giant snowfield of deep cold snow", give it a 10" if its "all the snow was melted and the ground bare" give it a zero. 
+- "score": it is up to you to decide the "sentiment" of the text. Sentiment score is based on how POSITIVE the description of snow is. 
+If the snow description is clearly very positive for example:
+ "giant snowfield of deep cold snow", give it a 10 "if its "all the snow was melted and the ground bare" give it a zero. 
  Here are some more examples "patchy thin snow" = 2, "large cornices with some bare ground" = 6, "several patches of snow" = 5
 Do NOT include any date field; we will compute it. If multiple entities appear, emit multiple rows (one per key entity).
 Output ONLY JSON: {"rows":[...]}.
