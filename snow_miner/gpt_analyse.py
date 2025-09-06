@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from typing import List, Dict, Optional, Tuple
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from tqdm import tqdm
+
+from snow_miner.regex_guardrails import DATE_REGEXES, is_snowy
 
 load_dotenv()
 
@@ -49,27 +50,6 @@ def chunk_spans(text: str, max_chars: int = 12000, overlap: int = 4000) -> List[
     return spans
 
 
-# ---------------- Global date indexing ----------------
-MONTHS = r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
-SEASONS = r"(winter|spring|summer|autumn|fall)"
-ORDINAL = r"(?:st|nd|rd|th)"
-YEAR = r"(?:18|19|20)\d{2}"
-
-DATE_PATTERNS = [
-    rf"\b\d{{1,2}}{ORDINAL}?\s+{MONTHS}\s+{YEAR}\b",  # 12th July 2019
-    rf"\b{MONTHS}\s+\d{{1,2}}{ORDINAL}?,\s*{YEAR}\b",  # July 12, 2019
-    rf"\b\d{{1,2}}{ORDINAL}?\s+{MONTHS}\b",  # 12 July
-    rf"\b{MONTHS}\s+\d{{1,2}}{ORDINAL}?\b",  # July 12
-    rf"\b{MONTHS}\s+{YEAR}\b",  # July 2019
-    rf"\b{YEAR}\s+{MONTHS}\b",  # 2019 July
-    rf"\b{SEASONS}\s+{YEAR}\b",  # Winter 1986
-    rf"\b{YEAR}\b",  # 1986
-    r"\b\d{1,2}[\/\-]\d{1,2}([\/\-]\d{2,4})?\b",  # 13/2/1988 or 13-02-88
-]
-
-DATE_REGEXES = [re.compile(p, flags=re.IGNORECASE) for p in DATE_PATTERNS]
-
-
 def find_all_dates_global(full_text: str) -> List[Tuple[int, int, str]]:
     """
     Return list of (start_idx, end_idx, matched_text) for all date-like mentions in the entire doc.
@@ -107,21 +87,35 @@ def nearest_global_date(dates: List[Tuple[int, int, str]], anchor_pos: int, max_
 
 
 EXTRACTION_PROMPT = """You extract snow-related information like a cryoscientist- thats all you do. 
-You are very good at it and you are aptly praised for your ability to stick to the prompt and not hallucinate
+You are very good at it and you are aptly praised for your ability to stick to the prompt and not hallucinate. The thing
+that people love the most about your is that you DONT WASTE OTHER PEOPLES TIME BY EXTRACTING TEXT NOT RELATED TO SNOW.
 
 From the CHUNK given to you, find compact snippets (≤5 sentences) that mention snow or ice including surface/avalanche conditions, 
 cornices, frozen lochs etc- anything to do with the cryosphere. I want you to double check though- it must actually relate to snow
-in some way and not just describe a mountain feature without mentioning snow or ice. It MUST mention snow or icw or do not include it!
+in some way and not just describe a mountain feature without mentioning snow or ice. It MUST mention snow or ice.
+You are cheating often during development- if it does not mention show or ice, do NOT include it. I dont want to see entries without snow/ice.
 For each, output a JSON object with:
+
 - "text": the exact snippet (copy verbatim from CHUNK; do NOT paraphrase- be a good scientist)
+
 - "entity": key snow term (e.g., snow, powder, deep, windslab, cornice, avalanche, thaw, melted, none, patchy, slushy)- 
 you can use more than one if you want to, such as "deep, frozen" etc
+
 - "location": mountain/area name if present (Gaelic ok), else null- be careful here as there will likely be more than 
 one location, just try your best
-- "score": it is up to you to decide the "sentiment" of the text. Sentiment score is based on how POSITIVE the description of snow is. 
+
+- "score": it is up to you to decide the "sentiment" of the text. Only use the "text" field previously extracted. 
+Sentiment score is based on how POSITIVE the description of snow is. 
 If the snow description is clearly very positive for example:
- "giant snowfield of deep cold snow", give it a 10 "if its "all the snow was melted and the ground bare" give it a zero. 
- Here are some more examples "patchy thin snow" = 2, "large cornices with some bare ground" = 6, "several patches of snow" = 5
+"giant snowfield of deep cold snow" would produce a value of 10 
+"all the snow was melted and the ground bare" would produce a value of 0
+"patchy thin snow" would produce a value of 2
+"large cornices with some bare ground" would produce a value of 6
+"several patches of snow" would produce a value of 4
+"large fields of old snow" would produce a value of 8
+"a corrie filled with melted slushy spring snow" would produce a value of 3
+Try not to just return a value of 5 for everything.
+
 Do NOT include any date field; we will compute it. If multiple entities appear, emit multiple rows (one per key entity).
 Output ONLY JSON: {"rows":[...]}.
 
@@ -171,6 +165,8 @@ def analyze_with_gpt(full_text: str) -> List[Dict]:
             full_snip = (r.get("text") or "").strip()
             if not full_snip:
                 continue
+            if not is_snowy(full_snip):
+                continue
 
             # try exact locate in chunk; if not found, try a prefix
             local_pos = chunk.find(full_snip)
@@ -194,7 +190,7 @@ def analyze_with_gpt(full_text: str) -> List[Dict]:
                 score = int(r.get("score"))
             except Exception:
                 score = 2
-            score = max(0, min(5, score))
+            score = max(0, min(10, score))
 
             print({
                 "text": full_snip,  # compact
