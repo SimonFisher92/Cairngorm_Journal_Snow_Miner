@@ -15,7 +15,8 @@ def detect_issue_from_filename(path: str) -> Optional[str]:
     start_year = 1893 - 1
     year = start_year + int(issue)
 
-    return f"issue_{issue}_year_{year}"
+    #return f"issue_{issue}_year_{year}"
+    return f"issue_{issue}"
 
 
 import os

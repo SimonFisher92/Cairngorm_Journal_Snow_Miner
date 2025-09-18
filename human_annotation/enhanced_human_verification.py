@@ -493,7 +493,8 @@ class SnippetAnnotator:
         self.show_snippet()
 
     def quit_app(self):
-        out_csv = self.csv_path.replace(".csv", "_dated.csv")
+        out_csv = self.csv_path.replace("out", "hand_curated")
+        #out_csv = "../scripts/hand_curated"
         self.df.to_csv(out_csv, index=False)
         self.doc.close()
         self.master.destroy()
@@ -513,9 +514,9 @@ class SnippetAnnotator:
 
 
 if __name__ == "__main__":
-    # Hardcode file paths here
-    csv_file = r"../scripts/out/issue_005_year_1897.csv"
-    pdf_file = r"../scripts/data/pdfs/The%20Cairngorm%20Club%20Journal%20005%20WM.pdf"
+    issue = '001'
+    csv_file = rf"../scripts/out/issue_{issue}.csv"
+    pdf_file = rf"../scripts/data/pdfs/The%20Cairngorm%20Club%20Journal%20{issue}%20WM.pdf"
 
     root = tk.Tk()
     root.title("Snippet Annotator")
