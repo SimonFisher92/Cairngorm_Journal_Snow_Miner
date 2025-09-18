@@ -514,7 +514,7 @@ class SnippetAnnotator:
 
 
 if __name__ == "__main__":
-    issue = '001'
+    issue = '002'
     csv_file = rf"../scripts/out/issue_{issue}.csv"
     pdf_file = rf"../scripts/data/pdfs/The%20Cairngorm%20Club%20Journal%20{issue}%20WM.pdf"
 
