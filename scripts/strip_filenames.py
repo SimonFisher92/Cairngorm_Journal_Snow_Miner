@@ -1,6 +1,14 @@
 from pathlib import Path
 
-def strip_year_and_after(dir_path, rename=False):
+def strip_year_and_after(dir_path: Path, rename=False) -> None:
+    """
+    Temp util function to clean up filenames
+
+    dir_path: path to directory containing pdf files
+    rename: bool to rename from old to new name
+
+    returns: nothing, inplace editing
+    """
     for p in Path(dir_path).glob("*.csv"):
         stem = p.stem  # filename without .csv
         pos = stem.find("_year")

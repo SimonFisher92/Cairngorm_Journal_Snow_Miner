@@ -8,6 +8,18 @@ from snow_miner.pipeline import scrape_and_download, process_all
 load_dotenv()
 
 def main():
+
+    """
+    Wrapper script with three options. Please do not spam to cairngorm club servers unless you need to- PDFs can be obtained from huggingface
+
+    --all - both scrape and mine pdfs (new users)
+    --scrape-only - only download pdfs
+    --process-only - only create GPT API calls for extracting snow data
+
+    By design, any GPT calls require a .env file containing your API key from GPT (obviously not provided in this codebase :) )
+
+    """
+
     ap = argparse.ArgumentParser(description="Cairngorm Snow Miner")
     ap.add_argument("--all", action="store_true", help="Scrape, download, and process PDFs")
     ap.add_argument("--scrape-only", action="store_true", help="Only scrape/download PDFs")

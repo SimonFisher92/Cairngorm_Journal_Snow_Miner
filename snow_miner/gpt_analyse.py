@@ -17,6 +17,9 @@ _client: Optional[OpenAI] = None
 
 
 def get_client() -> OpenAI:
+    """
+    Sets client for the user- a new user must put their API key in a .env file in root with "OPENAI_API_KEY="
+    """
     global _client
     if _client is None:
         api_key = os.getenv("OPENAI_API_KEY")
@@ -29,11 +32,18 @@ def get_client() -> OpenAI:
 client = OpenAI()
 
 
-# ---------------- Chunking that preserves global offsets ----------------
 def chunk_spans(text: str, max_chars: int = 12000, overlap: int = 4000) -> List[Tuple[int, int, str]]:
     """
-    Return list of (start_index, end_index, chunk_text) with overlaps,
-    so we can map snippet offsets back to global coordinates.
+    Return list of (start_index, end_index, chunk_text) with overlaps. These are used to stay within GPTs context
+    window when we create calls and are created in a way that we can map snippet offsets back to global coordinates.
+
+    text: the input text from the entry PDF
+    max_chars: max characters in the chunk- NB more characters= bigger chunks but not necessarily cheaper API calls
+    overlap: overlap in characters between document chunks
+
+    returns: the chunked text of positions and string
+
+
     """
     text = text or ""
     n = len(text)
@@ -52,7 +62,7 @@ def chunk_spans(text: str, max_chars: int = 12000, overlap: int = 4000) -> List[
 
 def find_all_dates_global(full_text: str) -> List[Tuple[int, int, str]]:
     """
-    Return list of (start_idx, end_idx, matched_text) for all date-like mentions in the entire doc.
+    Helper function to attempt to find dates, turns out GPT really struggles with this so human annotators will come in
     """
     dates: List[Tuple[int, int, str]] = []
     for rx in DATE_REGEXES:
@@ -67,7 +77,7 @@ def nearest_global_date(dates: List[Tuple[int, int, str]], anchor_pos: int, max_
     str]:
     """
     Choose the date whose start index is closest to anchor_pos. If max_dist is set,
-    return None if the closest is farther than this threshold. This currently sucks.
+    return None if the closest is farther than this threshold. GPT struggling so redundant function- short docstring
     """
     if not dates:
         return None
@@ -125,6 +135,14 @@ just do the best you can. And dont hallucinate.
 
 
 def gpt_api_call_on_chunk(chunk: str) -> List[Dict]:
+    """
+    GPT calls to extract snow entities based on the above promt and input chunk
+
+    chunk: input chunked text
+
+    returns: json object contraining requested fields ready to be parsed into csv
+    """
+
     prompt = f"{EXTRACTION_PROMPT}\n\nCHUNK:\n{chunk}\n"
     client = get_client()
     resp = client.chat.completions.create(
@@ -144,11 +162,18 @@ def gpt_api_call_on_chunk(chunk: str) -> List[Dict]:
 
 def analyze_with_gpt(full_text: str) -> List[Dict]:
     """
-    1) Pre-index all date mentions in the full document (global list of positions).
+    GPT call wrapper
+
+    1) Pre-index all date mentions in the full document (global list of positions). Dates are currently not good enough
+    from GPT so need human annotation
     2) Chunk text with global start offsets.
     3) Extract snow snippets per chunk with GPT (no dates).
     4) For each snippet, find its position in the chunk -> map to global anchor ->
        choose the nearest global date by character distance.
+
+    full_text: input text
+
+    returns: dictionary object obtained as json from API call
     """
 
     results: List[Dict] = []

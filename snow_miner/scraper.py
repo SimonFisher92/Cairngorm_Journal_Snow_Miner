@@ -24,7 +24,12 @@ def get_pdf_links():
     print(pdf_links)
     return pdf_links
 
-def download_pdfs(urls, dest_dir="data/pdfs", delay=0.5):
+def download_pdfs(urls: list, dest_dir="data/pdfs", delay=0.5):
+
+    """
+    PDF scraping- please dont trigger this unless you need to
+    """
+
     os.makedirs(dest_dir, exist_ok=True)
     saved = []
     for url in tqdm(urls):

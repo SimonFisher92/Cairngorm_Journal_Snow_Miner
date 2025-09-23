@@ -1,6 +1,6 @@
 import regex as re
 
-# Optional regex matching if GPT doesnt do well
+# Optional regex matching if GPT doesnt do well- not currently used but stored for posterity
 SNOW_TERMS = [
     # core
     "snow", "snowfall", "snowing", "snowed", "powder", "spindrift", "windslab",
@@ -20,7 +20,7 @@ SNOW_TERMS = [
     "spindrift", "windpacked"
 ]
 
-# Phrases/patterns with scores. Highest match wins.
+# Phrases/patterns with scores. Highest match wins. GPT takes care of this now- not currently used but stored for posterity
 # 0 (negative) → 5 (very positive). "avalanche" is set high as requested.
 SCORE_PATTERNS = [
     (5, r"\b(waist[- ]deep|knee[- ]deep|very deep|superb powder|powder day|avalanche(?:d)?|avalanches?)\b"),
@@ -33,7 +33,7 @@ SCORE_PATTERNS = [
 
 SCORE_REGEXES = [(score, re.compile(pattern, flags=re.IGNORECASE)) for score, pattern in SCORE_PATTERNS]
 
-# General snow entity detection patterns (broad net). These are used to tag the "entity" value.
+# General snow entity detection patterns (broad net). These are used to tag the "entity" value. - not currently used but stored for posterity
 ENTITY_PATTERNS = [
     r"\b(powder|spindrift|windslab|drifts?|cornices?|neve|névé|firn|ice|verglas)\b",
     r"\b(thaw(?:ing)?|melt(?:ed|ing)?|slush(?:y)?|patchy|none|bare|gone|disappeared)\b",

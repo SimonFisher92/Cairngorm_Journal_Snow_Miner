@@ -24,6 +24,9 @@ SNOW_REGEX = re.compile(
 
 
 def is_snowy(text: str) -> bool:
+    """
+    enforce snow regex to stop GPT timewasting with irrelevant entities
+    """
     return bool(SNOW_REGEX.search(text or ""))
 
 
