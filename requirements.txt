@@ -6,7 +6,7 @@ regex>=2024.5.15
 tqdm~=4.66.1
 dotenv
 pandas
-PyMuPDF
+fitz
 pillow
 regex
 openai
