@@ -1,6 +1,10 @@
 # Human Annotation and Verification
 
-Thank you for your interest in contributing to the project. Human verification is sadly (or not) needed, to ensure the quality and accuracy of the snow patch data. Below are the guidelines and steps to follow for human annotation and verification.
+Thank you for your interest in contributing to the project. Human verification is sadly (or not) needed, to ensure the quality and accuracy of the snow patch data. The primary reason is that it struggles with date identification. Sometimes the dates are buried way up in the chapter, often they require context and a bit of intelligence to disentangle. GPT is simply not there yet. Thus the main purpose here is to add as-granular-as-possible dates to the database- however, given that youre a human and you may take other issue, I have provided the option to also edit the location and even the snippet itself. Below are the guidelines and steps to follow for human annotation and verification.
+
+Just as an aside, I have tested this tool on both my workstation and my work laptop. Both have 32Gb+ ram available and the tool worked fine. I would be amazed if its greedy enough to overflow 8Gb so i think a regular machine should be fine, but if you have any issues at all please let me know.
+
+Finally, I am very open to suggestions about the GPT extraction process. Despite annotating 5 issues already, if you think there is an oversight or you want to see something else added in the GPT process then just let me know. But I would please ask that you do this imminently as we will need to redo any annotation performed against the old version for scientific integrity.
 
 ## Overview
 
