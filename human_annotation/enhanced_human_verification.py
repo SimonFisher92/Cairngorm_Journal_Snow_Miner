@@ -10,12 +10,22 @@ import unicodedata
 
 
 class SnippetAnnotator:
-    def __init__(self, master, csv_path, pdf_path,
+    def __init__(self, master, issue, csv_path, pdf_path, out_path,
                  text_col="text", date_col="date",
                  location_col="location", comment_col="annotator_comment"):
+
+        """
+        Absolute behemoth of a class to annotate text snippets extracted from PDFs. Part coded by Copilot hence verbose
+        comments. Iterates over extracted snippets, shows their location in the PDF, and allows the user to
+        input metadata (date, location, comments). Saves to a new CSV file. Takes argsparse path arguments to direct to issue
+        number, uncleaned csv dir, pdf dir, and output dir.
+        """
+
         self.master = master
+        self.issue = issue
         self.csv_path = csv_path
         self.pdf_path = pdf_path
+        self.out_path = out_path
         self.text_col = text_col
         self.date_col = date_col
         self.location_col = location_col
@@ -23,7 +33,6 @@ class SnippetAnnotator:
 
         self.df = pd.read_csv(csv_path)
 
-        # ensure needed columns exist and are string dtype
         for col in [self.date_col, self.location_col, self.comment_col]:
             if col not in self.df.columns:
                 self.df[col] = ""
@@ -32,14 +41,11 @@ class SnippetAnnotator:
         self.doc = fitz.open(pdf_path)
         self.current_idx = 0
 
-        # keep the render zoom consistent across methods
         self.render_zoom = 1.5
 
-        # --- UI Layout ---
         self.frame = tk.Frame(master)
         self.frame.pack(fill=tk.BOTH, expand=True)
 
-        # scrollable canvas
         self.canvas = tk.Canvas(self.frame, bg="black", highlightthickness=0)
         self.scroll_y = tk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         self.scroll_x = tk.Scrollbar(self.frame, orient="horizontal", command=self.canvas.xview)
@@ -121,7 +127,6 @@ class SnippetAnnotator:
         # Now just scroll to each snippet (no re-render needed)
         self.show_snippet()
 
-    # ---------- text normalization & shards ----------
     _WORD_RE = re.compile(r"[A-Za-z0-9'’-]+")
 
     def _norm(self, s: str) -> str:
@@ -208,11 +213,17 @@ class SnippetAnnotator:
 
     # ---------- row management ----------
     def reject_snippet(self):
+        """Reject the current snippet and remove it from the dataframe,
+        keeping the index position stable so the next snippet moves into
+        this slot.
+        """
         if len(self.df) == 0:
             return
 
+        # Drop current row and reset index
         self.df = self.df.drop(self.df.index[self.current_idx]).reset_index(drop=True)
 
+        # Fix snippet_target_page mapping (optional cleanup)
         if hasattr(self, "snippet_target_page") and isinstance(self.snippet_target_page, dict):
             new_map = {}
             for k, v in self.snippet_target_page.items():
@@ -222,6 +233,7 @@ class SnippetAnnotator:
                 new_map[new_k] = v
             self.snippet_target_page = new_map
 
+        # Handle case where we just deleted the last row
         if self.current_idx >= len(self.df):
             if len(self.df) == 0:
                 messagebox.showinfo("Done", "All snippets processed!")
@@ -229,6 +241,7 @@ class SnippetAnnotator:
                 return
             self.current_idx = len(self.df) - 1
 
+        # Refresh display at same slot
         self.show_snippet()
 
     def _precompute_all_highlights(self):
@@ -493,7 +506,7 @@ class SnippetAnnotator:
         self.show_snippet()
 
     def quit_app(self):
-        out_csv = self.csv_path.replace("out", "hand_curated")
+        out_csv = self.out_path + f"/issue_{self.issue}_curated.csv"
         #out_csv = "../scripts/hand_curated"
         self.df.to_csv(out_csv, index=False)
         self.doc.close()
@@ -514,11 +527,30 @@ class SnippetAnnotator:
 
 
 if __name__ == "__main__":
-    issue = '002'
-    csv_file = rf"../scripts/out/issue_{issue}.csv"
-    pdf_file = rf"../scripts/data/pdfs/The%20Cairngorm%20Club%20Journal%20{issue}%20WM.pdf"
+
+    #setup argsparse- issue number, path to csv dir, path to pdf dir
+
+    import argparse
+    parser = argparse.ArgumentParser(description="Snippet Annotator")
+    parser.add_argument("--issue", type=str, required=False, default='001', help="Issue number (e.g., '002')")
+    parser.add_argument("--uncleaned_dir", type=str, required=False, help="Path to root of uncleaned CSV files")
+    parser.add_argument("--pdf_dir", type=str, required=False, help="Path to root of PDF files")
+    parser.add_argument("--out", type=str, required=False, default='hand_curated', help="Output file")
+
+    args = parser.parse_args()
+
+    issue = args.issue
+
+    uncleaned_dir = args.uncleaned_dir
+    pdf_dir = args.pdf_dir
+    out = args.out
+
+    csv_file = rf"{uncleaned_dir}/issue_{issue}.csv"
+    pdf_file = rf"{pdf_dir}/The2520Club2520{issue}%2520WM.pdf"
+
 
     root = tk.Tk()
     root.title("Snippet Annotator")
-    app = SnippetAnnotator(root, csv_file, pdf_file)
+    app = SnippetAnnotator(root, issue, csv_file, pdf_file, out)
     root.mainloop()
+

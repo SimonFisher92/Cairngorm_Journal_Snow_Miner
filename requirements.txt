@@ -3,8 +3,11 @@ requests>=2.31
 pdfminer.six>=20231228
 dateparser>=1.2
 regex>=2024.5.15
-# Optional (only if you want to try local HF NER):
-# transformers>=4.41
-# torch>=2.2
-
 tqdm~=4.66.1
+dotenv
+pandas
+PyMuPDF
+pillow
+regex
+openai
+tqdm
