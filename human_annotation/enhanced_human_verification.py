@@ -546,7 +546,7 @@ if __name__ == "__main__":
     out = args.out
 
     csv_file = rf"{uncleaned_dir}/issue_{issue}.csv"
-    pdf_file = rf"{pdf_dir}/The2520Club2520{issue}%2520WM.pdf"
+    pdf_file = rf"{pdf_dir}/issue_{issue}.pdf"
 
 
     root = tk.Tk()
