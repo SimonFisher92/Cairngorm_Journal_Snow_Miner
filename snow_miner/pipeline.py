@@ -74,3 +74,4 @@ def process_all(pdf_dir: str = "data/pdfs", out_dir: str = "out", include_date_c
 def scrape_and_download(pdf_dir: str = "data/pdfs") -> List[str]:
     urls = get_pdf_links()
     return download_pdfs(urls, dest_dir=pdf_dir)
+

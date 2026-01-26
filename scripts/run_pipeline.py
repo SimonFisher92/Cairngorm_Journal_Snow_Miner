@@ -3,7 +3,7 @@ import argparse
 
 from dotenv import load_dotenv
 
-from snow_miner.pipeline import scrape_and_download, process_all
+from snow_miner import scrape_and_download, process_all
 
 load_dotenv()
 
