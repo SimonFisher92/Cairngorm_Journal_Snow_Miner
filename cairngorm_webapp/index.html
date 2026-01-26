@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scotland CSV Map</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Papa Parse -->
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --border:#e5e7eb;
+      --muted:#6b7280;
+      --text:#111827;
+      --bg:#ffffff;
+      --soft:#f9fafb;
+      --soft2:#f3f4f6;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+
+    html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text); }
+    .app { height: 100%; display: grid; grid-template-columns: 1.45fr 1fr; background: var(--bg); }
+
+    #map { height: 100%; position: relative; z-index: 1; }
+
+    .panel {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      border-left: 1px solid var(--border);
+      box-sizing: border-box;
+      padding: 14px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .headerCard{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 12px 10px;
+      background: linear-gradient(180deg, var(--soft) 0%, #fff 80%);
+      box-shadow: var(--shadow);
+    }
+    .headerTop{ display:flex; align-items:flex-start; justify-content:space-between; gap: 10px; }
+    .titleBlock h1{ font-size: 18px; margin: 0 0 4px; letter-spacing: .2px; }
+    .subtitle{ margin: 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .metaRow{ display:flex; flex-wrap:wrap; gap: 8px; margin-top: 10px; color: #374151; font-size: 12px; }
+    .chip{
+      display:inline-flex; align-items:center; gap: 6px;
+      padding: 6px 10px; border: 1px solid var(--border);
+      border-radius: 999px; background: #fff; white-space: nowrap;
+    }
+    .dot{ width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; display:inline-block; }
+    .empty { color: var(--muted); font-style: italic; }
+
+    .photoCard{
+      display:none;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .photoCard img{ width: 100%; height: 160px; object-fit: cover; display:block; }
+    .photoCaption{
+      padding: 8px 10px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--soft);
+    }
+
+    .tableWrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 10px;
+    }
+    tbody td {
+      font-size: 13px;
+      color: var(--text);
+      padding: 12px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: top;
+    }
+    tbody tr:hover td { background: var(--soft); }
+
+    .colDate{ width: 110px; color:#374151; font-variant-numeric: tabular-nums; }
+    .colLoc{ width: 180px; color:#374151; font-weight: 600; }
+    .textCell{ line-height: 1.35; }
+
+    .tagline{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap: 6px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--soft2);
+      color: #374151;
+      font-size: 12px;
+      border: 1px solid #eaeaea;
+    }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: 55vh 45vh; }
+      .panel { border-left: 0; border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div id="map"></div>
+
+    <div class="panel" id="panel">
+      <div class="headerCard">
+        <div class="headerTop">
+          <div class="titleBlock">
+            <h1 id="panelTitle">Loading…</h1>
+            <p class="subtitle" id="panelSubtitle">Hover or click a point to view entries.</p>
+          </div>
+        </div>
+        <div class="metaRow" id="panelMeta">
+          <span class="chip"><span class="dot"></span><span class="empty">No location selected.</span></span>
+        </div>
+      </div>
+
+      <div class="photoCard" id="photoCard">
+        <img id="photoImg" alt="Location photograph" />
+        <div class="photoCaption" id="photoCaption"></div>
+      </div>
+
+      <div class="tableWrap" id="tableWrap" aria-label="Entries table scroll area">
+        <table>
+          <thead>
+            <tr>
+              <th class="colDate">Date</th>
+              <th class="colLoc">Specific location</th>
+              <th>Text</th>
+            </tr>
+          </thead>
+          <tbody id="panelRows">
+            <tr><td colspan="3" class="empty">Hover or click a point to populate this table.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIG
+    // ============================================================
+    const CSV_PATH = "data/points.csv";
+
+    // Option B: one photo per GENERAL LOCATION
+    // Put your images in ./photos/ and map location name -> file path.
+    // The keys MUST match the "general_location" values in your CSV exactly.
+    const PHOTO_BY_LOCATION = {
+      "Torridon & Area": "photos/cairngorms_western_massif.jpg",
+      "Ben Nevis": "photos/cairngorms_western_massif.jpg",
+      "Central Highlands": "photos/cairngorms_western_massif.jpg",
+      "Ben Lui": "photos/cairngorms_western_massif.jpg",
+      "Ben Lawers": "photos/cairngorms_western_massif.jpg",
+      "Cairngorms Western Massif": "photos/cairngorms_western_massif.jpg",
+      "Cairngorms Other": "photos/cairngorms_western_massif.jpg",
+      "Ben Macdui": "photos/cairngorms_western_massif.jpg",
+      "Beinn a' Bhuird & Ben Avon": "photos/cairngorms_western_massif.jpg",
+      "Lochnagar": "photos/cairngorms_western_massif.jpg"
+    };
+
+    // Fallback if no mapping exists for a location:
+    const DEFAULT_PHOTO = "photos/default.jpg"; // set to "" to hide when missing
+
+    // ============================================================
+    // MAP SETUP
+    // ============================================================
+    const map = L.map("map", { zoomControl: true }).setView([56.9, -4.2], 6);
+
+    // Terrain/landform-focused basemap
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+      { maxZoom: 19, attribution: "Tiles © Esri" }
+    ).addTo(map);
+
+    // Make scrolling the right table not zoom the map
+    map.scrollWheelZoom.disable();
+
+    // Stop wheel events in the table from ever reaching the map
+    const tableWrap = document.getElementById("tableWrap");
+    tableWrap.addEventListener("wheel", (e) => e.stopPropagation(), { passive: true });
+
+    const markerLayer = L.layerGroup().addTo(map);
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function parseCoordinates(coordStr) {
+      if (!coordStr) return null;
+      const m = String(coordStr).match(/\(\s*([-+]?\d+(\.\d+)?)\s*,\s*([-+]?\d+(\.\d+)?)\s*\)/);
+      if (!m) return null;
+      const lat = Number(m[1]);
+      const lon = Number(m[3]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return [lat, lon];
+    }
+
+    function coordKey(lat, lon) {
+      return `${lat.toFixed(5)},${lon.toFixed(5)}`;
+    }
+
+    // For map labels + panel title: ONLY general_location
+    function titleFromRec(rec) {
+      return rec.general_location ? String(rec.general_location) : "Unknown location";
+    }
+
+    // Earliest plausible year from row.year or row.date
+    function extractYear(rec) {
+      const candidates = [rec.year, rec.date].filter(v => v !== undefined && v !== null);
+      for (const c of candidates) {
+        const s = String(c);
+        const m = s.match(/(1[0-9]{3}|20[0-9]{2})/);
+        if (m) return Number(m[1]);
+      }
+      return Number.POSITIVE_INFINITY;
+    }
+
+    // Secondary sort (month/day if available)
+    function extractMonthDay(rec) {
+      const s = String(rec.date ?? "");
+      let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(1[0-9]{3}|20[0-9]{2})$/); // dd/mm/yyyy
+      if (m) return { month: Number(m[2]), day: Number(m[1]) };
+
+      m = s.match(/^[-]\/(\d{1,2})\/(1[0-9]{3}|20[0-9]{2})$/); // -/mm/yyyy
+      if (m) return { month: Number(m[1]), day: 0 };
+
+      m = s.match(/^(1[0-9]{3}|20[0-9]{2})$/); // yyyy
+      if (m) return { month: 0, day: 0 };
+
+      return { month: 99, day: 99 };
+    }
+
+    function photoForLocation(generalLocation) {
+      const key = String(generalLocation || "").trim();
+      if (key && PHOTO_BY_LOCATION[key]) return PHOTO_BY_LOCATION[key];
+      return DEFAULT_PHOTO || "";
+    }
+
+    // ============================================================
+    // PHOTO + PANEL RENDERING (STICKY)
+    // ============================================================
+    function setPhoto(url, captionText) {
+      const card = document.getElementById("photoCard");
+      const img = document.getElementById("photoImg");
+      const cap = document.getElementById("photoCaption");
+
+      if (!url) {
+        card.style.display = "none";
+        img.removeAttribute("src");
+        cap.textContent = "";
+        return;
+      }
+
+      card.style.display = "block";
+      img.src = url;
+      cap.textContent = captionText || "";
+    }
+
+    function renderPanel(group) {
+      const titleEl = document.getElementById("panelTitle");
+      const subtitleEl = document.getElementById("panelSubtitle");
+      const metaEl = document.getElementById("panelMeta");
+      const rowsEl = document.getElementById("panelRows");
+
+      if (!group) {
+        titleEl.textContent = "Select a point";
+        subtitleEl.textContent = "Hover or click a point to view entries.";
+        metaEl.innerHTML = `<span class="chip"><span class="dot"></span><span class="empty">No location selected.</span></span>`;
+        rowsEl.innerHTML = `<tr><td colspan="3" class="empty">Hover or click a point to populate this table.</td></tr>`;
+        setPhoto("");
+        return;
+      }
+
+      const sorted = [...group.records].sort((a, b) => {
+        const ya = extractYear(a);
+        const yb = extractYear(b);
+        if (ya !== yb) return ya - yb;
+
+        const da = extractMonthDay(a);
+        const db = extractMonthDay(b);
+        if (da.month !== db.month) return da.month - db.month;
+        if (da.day !== db.day) return da.day - db.day;
+
+        return String(a.date ?? "").localeCompare(String(b.date ?? ""));
+      });
+
+      const locTitle = titleFromRec(sorted[0]);
+      titleEl.textContent = locTitle;
+      subtitleEl.textContent = "Entries sorted by earliest year.";
+
+      metaEl.innerHTML = `
+        <span class="chip"><span class="dot"></span><b>Coordinates:</b>&nbsp;${group.lat.toFixed(5)}, ${group.lon.toFixed(5)}</span>
+        <span class="chip"><b>Entries:</b>&nbsp;${sorted.length}</span>
+      `;
+
+      const photoUrl = photoForLocation(locTitle);
+      setPhoto(photoUrl, photoUrl ? `Photo for: ${locTitle}` : "");
+
+      rowsEl.innerHTML = sorted.map(r => {
+        const date = escapeHtml(r.date || "");
+        const gen = escapeHtml(r.specific_location || "");
+        const text = escapeHtml(r.text || "");
+
+        const entity = escapeHtml(r.entity || "");
+        const score = (r.score ?? "") !== "" ? `<span class="pill">score ${escapeHtml(r.score)}</span>` : "";
+        const comment = r.annotator_comment ? `<span class="pill">${escapeHtml(r.annotator_comment)}</span>` : "";
+
+        const tags = [];
+        if (entity) tags.push(`<span class="pill">${entity}</span>`);
+        if (score) tags.push(score);
+        if (comment) tags.push(comment);
+
+        return `
+          <tr>
+            <td class="colDate">${date}</td>
+            <td class="colLoc">${gen}</td>
+            <td class="textCell">
+              <div>${text}</div>
+              ${tags.length ? `<div class="tagline">${tags.join("")}</div>` : ""}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ============================================================
+    // BUILD MARKERS
+    // ============================================================
+    function rebuildMarkers(groups) {
+      markerLayer.clearLayers();
+
+      for (const g of groups.values()) {
+        const marker = L.circleMarker([g.lat, g.lon], {
+          radius: 7,
+          weight: 2,
+          fillOpacity: 0.6
+        });
+
+        marker.on("mouseover", () => renderPanel(g));
+        marker.on("click", () => renderPanel(g));
+
+        marker.bindTooltip(titleFromRec(g.records[0]) + ` (${g.records.length})`, {
+          direction: "top",
+          opacity: 0.95
+        });
+
+        marker.addTo(markerLayer);
+      }
+
+      const latlngs = Array.from(groups.values()).map(g => [g.lat, g.lon]);
+      if (latlngs.length) {
+        map.fitBounds(L.latLngBounds(latlngs).pad(0.25));
+      }
+    }
+
+    // ============================================================
+    // LOAD CSV
+    // ============================================================
+    async function loadCsv(url) {
+      document.getElementById("panelTitle").textContent = "Loading…";
+      document.getElementById("panelSubtitle").textContent = "Reading CSV and plotting points…";
+      renderPanel(null);
+
+      const groups = new Map();
+
+      return new Promise((resolve, reject) => {
+        let coordCol = null;
+
+        Papa.parse(url, {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          worker: false,
+          chunkSize: 1024 * 256,
+          transformHeader: h => (h ?? "").trim().replace(/^\uFEFF/, ""),
+          chunk: (results) => {
+            if (!coordCol) {
+              const fields = results.meta?.fields || [];
+              const lower = fields.map(f => String(f).toLowerCase());
+              const idx =
+                lower.indexOf("coordinates") >= 0 ? lower.indexOf("coordinates") :
+                lower.indexOf("coords") >= 0 ? lower.indexOf("coords") :
+                lower.indexOf("coord") >= 0 ? lower.indexOf("coord") : -1;
+              coordCol = idx >= 0 ? fields[idx] : null;
+
+              if (!coordCol) console.error("No Coordinates column found. Headers:", fields);
+            }
+
+            for (const row of results.data) {
+              const coords = parseCoordinates(coordCol ? row[coordCol] : null);
+              if (!coords) continue;
+
+              const [lat, lon] = coords;
+              const k = coordKey(lat, lon);
+
+              const rec = {
+                text: row.text ?? "",
+                entity: row.entity ?? "",
+                score: row.score ?? "",
+                date: row.date ?? "",
+                annotator_comment: row.annotator_comment ?? "",
+                general_location: row.general_location ?? "",
+                specific_location: row.specific_location ?? "",
+                year: row.year ?? "",
+                coordinates: coords
+              };
+
+              if (!groups.has(k)) groups.set(k, { lat, lon, records: [] });
+              groups.get(k).records.push(rec);
+            }
+          },
+          complete: () => resolve(groups),
+          error: (err) => reject(err)
+        });
+      });
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    (async function init() {
+      try {
+        const url = new URL("data/points.csv", window.location.href).toString();
+        const groups = await loadCsv(url);
+        rebuildMarkers(groups);
+
+        document.getElementById("panelTitle").textContent = "Select a point";
+        document.getElementById("panelSubtitle").textContent = "Hover or click a point to view entries.";
+      } catch (e) {
+        document.getElementById("panelTitle").textContent = "Error";
+        document.getElementById("panelSubtitle").textContent = String(e);
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
