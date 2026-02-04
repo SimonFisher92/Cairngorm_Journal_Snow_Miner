@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scotland CSV Map</title>
+  <title>SNOSCOT v1.5</title>
+
+  <div class="doiNote">Semi-automated curation of Cairngorm Mountaineering Journals DOI: 10.57967/hf/7619. Get the fully open-license dataset @ https://huggingface.co/datasets/SimonF92-Snow/Curated_Cairngorm_Journal_Snow_Observations_1893_2023</div>
+
+
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -24,7 +28,7 @@
     }
 
     html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text); }
-    .app { height: 100%; display: grid; grid-template-columns: 1.45fr 1fr; background: var(--bg); }
+    .app { height: 100%; display: grid; grid-template-columns: 1fr 1.45fr; background: var(--bg); }
 
     #map { height: 100%; position: relative; z-index: 1; }
 
@@ -41,6 +45,27 @@
       gap: 12px;
       overflow: hidden;
     }
+
+    .doiNote{
+      margin-top: 10px;
+      margin-left: auto;                 /* push to the right in flex contexts */
+      width: fit-content;                /* hug the text */
+      max-width: 100%;
+      padding: 6px 10px;
+
+      font-size: 12px;
+      letter-spacing: .2px;
+      color: #374151;
+
+      text-align: right;
+
+      background: linear-gradient(180deg, rgba(249,250,251,.95) 0%, rgba(255,255,255,.9) 100%);
+      border: 1px solid rgba(229,231,235,.9);
+      border-radius: 999px;
+
+      box-shadow: 0 10px 24px rgba(0,0,0,.08);
+      backdrop-filter: blur(6px);
+}
 
     .headerCard{
       border: 1px solid var(--border);
@@ -233,7 +258,7 @@
     // ============================================================
     // MAP SETUP
     // ============================================================
-    const map = L.map("map", { zoomControl: true }).setView([56.9, -4.2], 6);
+    const map = L.map("map", { zoomControl: true }).setView([56.9, -4.2], 8);
 
     L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
