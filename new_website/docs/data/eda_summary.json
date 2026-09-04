@@ -1,0 +1,473 @@
+{
+  "generated_from": "docs/data/points.csv",
+  "summary": {
+    "observations": 2381,
+    "broad_regions": 16,
+    "specific_locations": 546,
+    "earliest_year": 1618,
+    "latest_year": 2018,
+    "years_represented": 144,
+    "geocoded": 2292,
+    "geocoded_percent": 96.3,
+    "mean_score": 6.36,
+    "median_score": 7.0,
+    "records_with_month": 1997,
+    "invalid_month_values": 1
+  },
+  "locations": [
+    {
+      "label": "Lochnagar",
+      "count": 473
+    },
+    {
+      "label": "Cairngorms Other",
+      "count": 431
+    },
+    {
+      "label": "Cairngorms Western Massif",
+      "count": 259
+    },
+    {
+      "label": "Ben Macdui",
+      "count": 211
+    },
+    {
+      "label": "Eastern Highlands",
+      "count": 181
+    },
+    {
+      "label": "Central Highlands",
+      "count": 160
+    },
+    {
+      "label": "Ben Nevis",
+      "count": 120
+    },
+    {
+      "label": "Beinn a' Bhuird & Ben Avon",
+      "count": 119
+    },
+    {
+      "label": "North West Highlands",
+      "count": 95
+    },
+    {
+      "label": "Other Highlands",
+      "count": 79
+    },
+    {
+      "label": "Southern Highlands",
+      "count": 78
+    },
+    {
+      "label": "Glenshee Area",
+      "count": 62
+    },
+    {
+      "label": "Ben Lawers",
+      "count": 62
+    },
+    {
+      "label": "Ben Lui",
+      "count": 41
+    },
+    {
+      "label": "Ben Cruachan",
+      "count": 9
+    },
+    {
+      "label": "Beinn an Dothaidh",
+      "count": 1
+    }
+  ],
+  "months": [
+    {
+      "label": "Jan",
+      "month": 1,
+      "count": 250
+    },
+    {
+      "label": "Feb",
+      "month": 2,
+      "count": 156
+    },
+    {
+      "label": "Mar",
+      "month": 3,
+      "count": 212
+    },
+    {
+      "label": "Apr",
+      "month": 4,
+      "count": 465
+    },
+    {
+      "label": "May",
+      "month": 5,
+      "count": 264
+    },
+    {
+      "label": "Jun",
+      "month": 6,
+      "count": 160
+    },
+    {
+      "label": "Jul",
+      "month": 7,
+      "count": 147
+    },
+    {
+      "label": "Aug",
+      "month": 8,
+      "count": 46
+    },
+    {
+      "label": "Sep",
+      "month": 9,
+      "count": 45
+    },
+    {
+      "label": "Oct",
+      "month": 10,
+      "count": 70
+    },
+    {
+      "label": "Nov",
+      "month": 11,
+      "count": 48
+    },
+    {
+      "label": "Dec",
+      "month": 12,
+      "count": 134
+    }
+  ],
+  "seasons": [
+    {
+      "label": "Winter",
+      "count": 637
+    },
+    {
+      "label": "Spring",
+      "count": 1023
+    },
+    {
+      "label": "Summer",
+      "count": 389
+    },
+    {
+      "label": "Autumn",
+      "count": 167
+    },
+    {
+      "label": "Unknown",
+      "count": 165
+    }
+  ],
+  "scores": [
+    {
+      "label": "0",
+      "score": 0,
+      "count": 15
+    },
+    {
+      "label": "1",
+      "score": 1,
+      "count": 10
+    },
+    {
+      "label": "2",
+      "score": 2,
+      "count": 77
+    },
+    {
+      "label": "3",
+      "score": 3,
+      "count": 144
+    },
+    {
+      "label": "4",
+      "score": 4,
+      "count": 260
+    },
+    {
+      "label": "5",
+      "score": 5,
+      "count": 218
+    },
+    {
+      "label": "6",
+      "score": 6,
+      "count": 409
+    },
+    {
+      "label": "7",
+      "score": 7,
+      "count": 373
+    },
+    {
+      "label": "8",
+      "score": 8,
+      "count": 572
+    },
+    {
+      "label": "9",
+      "score": 9,
+      "count": 254
+    },
+    {
+      "label": "10",
+      "score": 10,
+      "count": 48
+    }
+  ],
+  "decades": [
+    {
+      "label": "1610s",
+      "decade": 1610,
+      "count": 1
+    },
+    {
+      "label": "1640s",
+      "decade": 1640,
+      "count": 1
+    },
+    {
+      "label": "1660s",
+      "decade": 1660,
+      "count": 2
+    },
+    {
+      "label": "1760s",
+      "decade": 1760,
+      "count": 2
+    },
+    {
+      "label": "1790s",
+      "decade": 1790,
+      "count": 4
+    },
+    {
+      "label": "1800s",
+      "decade": 1800,
+      "count": 7
+    },
+    {
+      "label": "1810s",
+      "decade": 1810,
+      "count": 4
+    },
+    {
+      "label": "1830s",
+      "decade": 1830,
+      "count": 1
+    },
+    {
+      "label": "1840s",
+      "decade": 1840,
+      "count": 1
+    },
+    {
+      "label": "1850s",
+      "decade": 1850,
+      "count": 15
+    },
+    {
+      "label": "1860s",
+      "decade": 1860,
+      "count": 26
+    },
+    {
+      "label": "1870s",
+      "decade": 1870,
+      "count": 11
+    },
+    {
+      "label": "1880s",
+      "decade": 1880,
+      "count": 14
+    },
+    {
+      "label": "1890s",
+      "decade": 1890,
+      "count": 335
+    },
+    {
+      "label": "1900s",
+      "decade": 1900,
+      "count": 434
+    },
+    {
+      "label": "1910s",
+      "decade": 1910,
+      "count": 267
+    },
+    {
+      "label": "1920s",
+      "decade": 1920,
+      "count": 326
+    },
+    {
+      "label": "1930s",
+      "decade": 1930,
+      "count": 357
+    },
+    {
+      "label": "1940s",
+      "decade": 1940,
+      "count": 141
+    },
+    {
+      "label": "1950s",
+      "decade": 1950,
+      "count": 87
+    },
+    {
+      "label": "1960s",
+      "decade": 1960,
+      "count": 13
+    },
+    {
+      "label": "1970s",
+      "decade": 1970,
+      "count": 58
+    },
+    {
+      "label": "1980s",
+      "decade": 1980,
+      "count": 87
+    },
+    {
+      "label": "1990s",
+      "decade": 1990,
+      "count": 66
+    },
+    {
+      "label": "2000s",
+      "decade": 2000,
+      "count": 21
+    },
+    {
+      "label": "2010s",
+      "decade": 2010,
+      "count": 8
+    }
+  ],
+  "top_entities": [
+    {
+      "label": "snow",
+      "count": 1838
+    },
+    {
+      "label": "ice",
+      "count": 176
+    },
+    {
+      "label": "deep",
+      "count": 114
+    },
+    {
+      "label": "frozen",
+      "count": 103
+    },
+    {
+      "label": "soft",
+      "count": 102
+    },
+    {
+      "label": "cornice",
+      "count": 84
+    },
+    {
+      "label": "hard",
+      "count": 51
+    },
+    {
+      "label": "avalanche",
+      "count": 50
+    },
+    {
+      "label": "patches",
+      "count": 48
+    },
+    {
+      "label": "fresh",
+      "count": 35
+    },
+    {
+      "label": "winter",
+      "count": 31
+    },
+    {
+      "label": "snow-clad",
+      "count": 29
+    },
+    {
+      "label": "patch",
+      "count": 29
+    },
+    {
+      "label": "heavy",
+      "count": 28
+    },
+    {
+      "label": "snowy",
+      "count": 28
+    },
+    {
+      "label": "melting",
+      "count": 25
+    },
+    {
+      "label": "icy",
+      "count": 25
+    },
+    {
+      "label": "blizzard",
+      "count": 24
+    }
+  ],
+  "completeness": [
+    {
+      "label": "Text",
+      "present": 2380,
+      "missing": 1,
+      "percent": 100.0
+    },
+    {
+      "label": "Entity label",
+      "present": 2380,
+      "missing": 1,
+      "percent": 100.0
+    },
+    {
+      "label": "Year",
+      "present": 2289,
+      "missing": 92,
+      "percent": 96.1
+    },
+    {
+      "label": "Month",
+      "present": 1997,
+      "missing": 384,
+      "percent": 83.9
+    },
+    {
+      "label": "Specific location",
+      "present": 2361,
+      "missing": 20,
+      "percent": 99.2
+    },
+    {
+      "label": "Map coordinates",
+      "present": 2292,
+      "missing": 89,
+      "percent": 96.3
+    }
+  ],
+  "notes": [
+    "Counts describe surviving journal coverage and the curation process; they are not a direct climate time series.",
+    "Months are available for most, but not all, observations. One invalid month value is excluded from seasonal charts.",
+    "Map coordinates identify broad regional groupings rather than the precise position of every quoted observation."
+  ]
+}
