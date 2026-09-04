@@ -42,7 +42,7 @@
 
       <div class="hero-content shell">
         <p class="eyebrow light">Cairngorm Club journals · 1893–2023</p>
-        <h1 id="hero-title">Scotland’s mountain snow,<br><em>read from the archive.</em></h1>
+        <h1 id="hero-title">Building a text-dataset of Scotland’s mountain snow</h1>
         <p class="hero-intro">
           A human-verified record of snow and ice observations recovered from historic
           mountaineering journals—made searchable by place, season and year.
@@ -78,15 +78,16 @@
     <section class="intro-section section-pad" aria-labelledby="intro-title">
       <div class="shell intro-grid">
         <div>
-          <p class="eyebrow">An archive becomes a dataset</p>
-          <h2 id="intro-title">Two centuries of conditions, preserved in people’s words.</h2>
+          <p class="eyebrow">Text is an under-utilised asset for Scottish climate change</p>
+          <h2 id="intro-title">Two centuries of observations, mined using AI and verified by human volunteers.</h2>
         </div>
         <div class="intro-copy">
           <p>
-            Mountaineers recorded snowfields, cornices, avalanches, frozen lochs and sudden
-            thaws long before systematic high-mountain monitoring was common. SNOSCOT brings
+            Mountaineers recorded snowfields, cornices, avalanches, frozen lochs in journals and
+            diaries well before the deliberate action of the late 20th and 21st centuries. SNOSCOT brings
             those dispersed accounts together as structured observations while retaining the
-            original language of the source material.
+            original language of the source material. We used AI to mine the text (wince), but hand verified
+            all extracted fields against the reference text. This project would not have been possible without AI.
           </p>
           <p>
             The collection centres on Cairngorm Club journals published from 1893 to 2023 and
@@ -199,7 +200,7 @@
           <article>
             <span class="metric-number"><span data-stat="mean_score">6.36</span><small>/10</small></span>
             <h3>mean snow score</h3>
-            <p>The curation score describes how positive or substantial the snow description is.</p>
+            <p>The curation score describes how positive or substantial the snow description is. The "Snow Score" is itself defined and calculated by GPT4o.</p>
           </article>
           <article>
             <span class="metric-number" data-stat="years_represented">144</span>
@@ -293,7 +294,9 @@
               <p>
                 Changes in authorship, publication frequency, trip patterns, vocabulary and
                 journal survival all affect these counts. The dataset is valuable evidence for
-                historical research, but trend claims require source-aware sampling and validation.
+                historical research, but trend claims require source-aware sampling and validation. The humans
+                who designed and executed this project wish to strongly emphasise that the trend may be as a much
+                a factor of observation style as it may be geophysical changes.
               </p>
             </div>
           </aside>
@@ -321,17 +324,20 @@
           <li>
             <span class="step-number">01</span>
             <h3>Acquire &amp; extract</h3>
-            <p>Journal PDFs are collected and their pages converted into machine-readable text.</p>
+            <p>Journal PDFs are collected and their pages converted into machine-readable text. This involves a process
+            known as document-chunking where overlapping chunks are generated for downstream extraction. This is because
+            LLMs have a context window</p>
           </li>
           <li>
             <span class="step-number">02</span>
             <h3>Identify candidates</h3>
-            <p>A GPT-4o-family model finds compact passages that explicitly mention snow, ice or related cryosphere conditions.</p>
+            <p>A GPT-4o-family model finds compact passages that explicitly mention snow, ice or related cryosphere conditions.
+            Why GPT-4o? Fundamentally, cost. SimonF92 funded API calls with his own money. Price estimates to redo this with advanced models are ~£150-£250.</p>
           </li>
           <li>
             <span class="step-number">03</span>
             <h3>Verify &amp; repair</h3>
-            <p>Each quotation, entity, score, date and location is reviewed against the source text; hallucinations are removed.</p>
+            <p>Each quotation, entity, score, date and location is reviewed against the source text by a human being; hallucinations are removed, dates are refined and locations are narrowed down as much as possible.</p>
           </li>
           <li>
             <span class="step-number">04</span>
@@ -375,11 +381,13 @@
       <div class="access-overlay"></div>
       <div class="shell access-content">
         <p class="eyebrow light">Open research dataset</p>
-        <h2 id="access-title">Read it. Question it.<br>Build on it.</h2>
+        <h2 id="access-title">Collaboration is key</h2>
         <p>
           The mined and curated dataset outputs are released under Apache 2.0. Rights in the
           original journal PDFs remain with the Cairngorm Club; contact the relevant rights holder
           before reusing source documents themselves.
+
+          If an academic institution wishes to adopt and refine this work with larger models for a PhD student project then please do get in touch.
         </p>
         <div class="access-actions">
           <a class="button button-primary" href="https://huggingface.co/datasets/SimonF92-Snow/Curated_Cairngorm_Journal_Snow_Observations_1893_2023" target="_blank" rel="noreferrer">Open on Hugging Face <span aria-hidden="true">↗</span></a>
